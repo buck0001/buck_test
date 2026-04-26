@@ -1599,12 +1599,18 @@
   <!-- Toast -->
   <div class="toast success" id="toast">Welcome back, test! 👋</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script>
     // ──────────── SUPABASE ────────────
     const SUPABASE_URL = 'https://pypazcjgbzmwpuenikjz.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_5QXPT4nJyb3Uut_jQoYaFA_zLHuxpGD';
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Connection test — check browser console (F12) if registration fails
+    sb.from('users').select('count', { count: 'exact', head: true }).then(({ error }) => {
+      if (error) console.error('SUPABASE CONNECTION ERROR:', error.message, '| code:', error.code, '| hint:', error.hint);
+      else console.log('Supabase connected OK');
+    });
 
     // ──────────── STATE ────────────
     const SESSION_KEY = 'nexvault_session';
@@ -1695,7 +1701,7 @@
         name, email, pass, joined: new Date().toISOString()
       }).select().single();
 
-      if (error) { toast('Registration failed. Please try again.', 'error'); console.error(error); return; }
+      if (error) { console.error('REGISTER ERROR:', error); toast('Failed: ' + (error.message || error.code || JSON.stringify(error)), 'error'); return; }
 
       saveSession(newUser);
       closeModal('auth');
